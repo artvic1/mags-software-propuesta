@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SG-SST Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7cb42c;
+            --secondary: #2c2c2c;
+            --light: #f5f5f5;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f9fafb;
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        
+        .card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .modal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: absolute;
+                z-index: 50;
+                height: 100vh;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 40;
+            }
+            
+            .overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <div class="sidebar bg-[var(--secondary)] text-white w-64 flex-shrink-0 overflow-y-auto">
+        <div class="p-4 flex items-center justify-center border-b border-gray-700 relative">
+            <div class="flex items-center">
+                <img src="logo.png" alt="Logo" class="h-8">
+            </div>
+            <button id="sidebar-close" class="md:hidden text-gray-400 hover:text-white absolute right-4">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <nav class="p-4">
+            <div class="mb-6">
+                <div class="text-xs uppercase text-gray-400 font-medium mb-3">Principal</div>
+                <ul>
+                    <li>
+                        <a href="index.html" class="flex items-center space-x-3 p-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="mb-6">
+                <div class="text-xs uppercase text-gray-400 font-medium mb-3">Gestión</div>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="inspecciones.html" class="flex items-center space-x-3 p-2 rounded-lg bg-[var(--primary)] text-white">
+                            <i class="fas fa-clipboard-check"></i>
+                            <span>Inspecciones</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="reportes.html" class="flex items-center space-x-3 p-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Reportes e Indicadores</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Programas y Campañas</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="mb-6">
+                <div class="text-xs uppercase text-gray-400 font-medium mb-3">Matrices</div>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Peligros</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white">
+                            <i class="fas fa-hard-hat"></i>
+                            <span>EPP</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="mb-6">
+                <div class="text-xs uppercase text-gray-400 font-medium mb-3">Administración</div>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white">
+                            <i class="fas fa-file-alt"></i>
+                            <span>Formatos Digitales</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white">
+                            <i class="fas fa-gavel"></i>
+                            <span>Normatividad SST</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white">
+                            <i class="fas fa-users-cog"></i>
+                            <span>Usuarios/Roles</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center space-x-3 p-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white">
+                            <i class="fas fa-cog"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    
+    <!-- Mobile overlay -->
+    <div class="overlay"></div>
+    
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top navbar -->
+        <header class="bg-white border-b border-gray-200 flex items-center justify-between p-4">
+            <div class="flex items-center space-x-4">
+                <button id="sidebar-toggle" class="md:hidden text-gray-600 hover:text-gray-900">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="text-xl font-semibold text-gray-800">Dashboard</h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 relative">
+                    <i class="fas fa-bell"></i>
+                    <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                </button>
+                
+                <div class="flex items-center space-x-2">
+                    <div class="h-8 w-8 rounded-full bg-[var(--primary)] flex items-center justify-center text-white font-medium">
+                        MG
+                    </div>
+                    <span class="hidden md:inline text-sm font-medium">Miguel Gonzalez</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main content area -->
+        <main class="flex-1 overflow-y-auto p-4 bg-gray-50">
+            <!-- Header and actions -->
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+                <h2 class="text-lg font-semibold text-gray-800">Gestión de Inspecciones</h2>
+                <button onclick="openModal('nueva-inspeccion-modal')" class="bg-[var(--primary)] hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition">
+                    <i class="fas fa-plus"></i>
+                    <span>Nueva Inspección</span>
+                </button>
+            </div>
+
+            <!-- New inspection form modal -->
+            <div id="nueva-inspeccion-modal" class="modal fixed inset-0 z-50 flex items-center justify-center opacity-0 invisible">
+                <div class="modal-overlay absolute inset-0 bg-black opacity-50"></div>
+                
+                <div class="modal-container bg-white w-full max-w-md mx-auto rounded-lg shadow-lg z-50 overflow-y-auto transform transition-all">
+                    <div class="modal-content py-4 px-6">
+                        <div class="flex items-center justify-between border-b pb-3">
+                            <h3 class="text-lg font-semibold">Registrar Nueva Inspección</h3>
+                            <button onclick="closeModal('nueva-inspeccion-modal')" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="mt-4 space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Lugar de inspección</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder="Ej: Área de producción">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Responsable</label>
+                                <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder="Nombre del inspector">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                                <input type="date" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+                                <textarea rows="3" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder="Detalles de la inspección..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <button onclick="closeModal('nueva-inspeccion-modal')" type="button" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]">
+                                Cancelar
+                            </button>
+                            <button type="button" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--primary)] hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]">
+                                Registrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inspections table -->
+            <div class="card bg-white rounded-xl shadow overflow-hidden mb-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lugar</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsable</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15/06/2023</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Área de producción</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Juan Pérez</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Completada</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-[var(--primary)] hover:text-green-600 mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-blue-500 hover:text-blue-600 mr-3">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500 hover:text-red-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">10/06/2023</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Almacén</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">María Gómez</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Pendiente</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-[var(--primary)] hover:text-green-600 mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-blue-500 hover:text-blue-600 mr-3">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500 hover:text-red-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">05/06/2023</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Oficinas</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Carlos Rojas</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Completada</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button class="text-[var(--primary)] hover:text-green-600 mr-3">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-blue-500 hover:text-blue-600 mr-3">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-500 hover:text-red-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </main>
+    </div>
+    
+    <!-- Modals -->
+    <!-- Report modal -->
+    <div id="report-modal" class="modal fixed inset-0 z-50 flex items-center justify-center opacity-0 invisible">
+        <div class="modal-overlay absolute inset-0 bg-black opacity-50"></div>
+        
+        <div class="modal-container bg-white w-full max-w-md mx-auto rounded-lg shadow-lg z-50 overflow-y-auto transform transition-all">
+            <div class="modal-content py-4 px-6">
+                <div class="flex items-center justify-between border-b pb-3">
+                    <h3 class="text-lg font-semibold">Nuevo Reporte de Incidente</h3>
+                    <button onclick="closeModal('report-modal')" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="mt-4 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de incidente</label>
+                        <select class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+                            <option>Seleccione...</option>
+                            <option>Accidente de trabajo</option>
+                            <option>Incidente peligroso</option>
+                            <option>Enfermedad laboral</option>
+                            <option>Condición insegura</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha y hora</label>
+                        <input type="datetime-local" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Área/Lugar</label>
+                        <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder="Ej: Almacén principal">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                        <textarea rows="3" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder="Describa el incidente en detalle..."></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Adjuntar evidencia (opcional)</label>
+                        <div class="mt-1 flex items-center">
+                            <label for="file-upload" class="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]">
+                                <i class="fas fa-paperclip mr-1"></i> Seleccionar archivo
+                            </label>
+                            <input id="file-upload" name="file-upload" type="file" class="sr-only">
+                            <span class="ml-2 text-sm text-gray-500">No se ha seleccionado archivo</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button onclick="closeModal('report-modal')" type="button" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]">
+                        Cancelar
+                    </button>
+                    <button type="button" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--primary)] hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]">
+                        Enviar reporte
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upload modal -->
+    <div id="upload-modal" class="modal fixed inset-0 z-50 flex items-center justify-center opacity-0 invisible">
+        <div class="modal-overlay absolute inset-0 bg-black opacity-50"></div>
+        
+        <div class="modal-container bg-white w-full max-w-md mx-auto rounded-lg shadow-lg z-50 overflow-y-auto transform transition-all">
+            <div class="modal-content py-4 px-6">
+                <div class="flex items-center justify-between border-b pb-3">
+                    <h3 class="text-lg font-semibold">Subir Documento SST</h3>
+                    <button onclick="closeModal('upload-modal')" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="mt-4 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de documento</label>
+                        <select class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+                            <option>Seleccione...</option>
+                            <option>Acta de reunión</option>
+                            <option>Informe de inspección</option>
+                            <option>Certificado de capacitación</option>
+                            <option>Registro de entrega EPP</option>
+                            <option>Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha del documento</label>
+                        <input type="date" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                        <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" placeholder="Breve descripción del documento">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Archivo</label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <div class="flex text-sm text-gray-600">
+                                    <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-[var(--primary)] hover:text-green-500 focus-within:outline-none">
+                                        <span>Subir un archivo</span>
+                                        <input id="file-upload" name="file-upload" type="file" class="sr-only">
+                                    </label>
+                                    <p class="pl-1">o arrastrar aquí</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PDF, DOC, XLS hasta 10MB</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button onclick="closeModal('upload-modal')" type="button" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]">
+                        Cancelar
+                    </button>
+                    <button type="button" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--primary)] hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]">
+                        Subir documento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sidebar toggle for mobile
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarClose = document.getElementById('sidebar-close');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.overlay');
+        
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+        });
+        
+        sidebarClose.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+        
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+        
+        // Modal functions
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('invisible', 'opacity-0');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('invisible', 'opacity-0');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function() {
+                const modalId = this.closest('.modal').id;
+                closeModal(modalId);
+            });
+        });
+        
+        // Initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Accidents chart (bar)
+            const accidentsCtx = document.getElementById('accidentsChart').getContext('2d');
+            const accidentsChart = new Chart(accidentsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Accidentes reportados',
+                        data: [3, 5, 2, 4, 6, 2],
+                        backgroundColor: '#7cb42c',
+                        borderColor: '#7cb42c',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            // Incidents chart (doughnut)
+            const incidentsCtx = document.getElementById('incidentsChart').getContext('2d');
+            const incidentsChart = new Chart(incidentsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Accidentes', 'Incidentes', 'Condiciones inseguras', 'Actos inseguros'],
+                    datasets: [{
+                        data: [12, 24, 18, 32],
+                        backgroundColor: [
+                            '#7cb42c',
+                            '#3b82f6',
+                            '#f59e0b',
+                            '#ef4444'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+            
+            // Tooltip initialization
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+        
+        // Simple localStorage example for demo purposes
+        function saveToLocalStorage(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+        
+        function getFromLocalStorage(key) {
+            const item = localStorage.getItem(key);
+            return item ? JSON.parse(item) : null;
+        }
+        
+        // Example usage:
+        // saveToLocalStorage('recentReports', [{id: 1, type: 'Accidente', date: '2023-06-10'}]);
+        // const reports = getFromLocalStorage('recentReports');
+    </script>
+</body>
+</html>
